@@ -1,4 +1,4 @@
-import { genAI} from "@/lib/openai";
+import { genAI} from "@/lib/gemini";
 import { exec } from "child_process";
 import { NextRequest, NextResponse } from "next/server";
 import { ZodTypeAny, z } from "zod";
