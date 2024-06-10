@@ -1,0 +1,18 @@
+meta {
+  name: json
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:3000/api/json
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "data":"my name is abhishek gusain",
+    "format":{"age":{"type":"number"}}
+  }
+}
