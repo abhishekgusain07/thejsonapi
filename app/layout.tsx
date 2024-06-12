@@ -8,6 +8,9 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "theJsonApi",
   description: "Made by Abhishek Gusain",
+  icons:{
+    icon: '/icon.png'
+  }
 };
 
 export default function RootLayout({
@@ -23,11 +26,11 @@ export default function RootLayout({
         socialButtonsVariant: 'iconButton'
       },
       variables:{
-        colorText: '#fff',
+        colorText: 'black',
         colorPrimary: '#0E78F9',
-        colorBackground: '#1c1f2e',
-        colorInputBackground: '#252a41',
-        colorInputText: '#fff'
+        colorBackground: '#ffffff',
+        colorInputBackground: '#ffffff',
+        colorInputText: 'black'
       }
     }}>
       <html lang="en">

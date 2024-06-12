@@ -82,6 +82,8 @@ const transformObject = (input: InputType): TransformedType => {
   };
 export const POST = async(req: NextRequest) => {
     const body = await req.json();
+    // todo: validate api key of the user.
+    
 
     //validation incoming data format using zod
     //and the format we want to send the data back again
