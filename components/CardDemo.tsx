@@ -53,7 +53,7 @@ export function CardDemo({ className, ...props }: CardProps) {
                     title
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    "description"
+                    description
                   </p>
                 </div>
             </div>
