@@ -42,6 +42,8 @@ type PromiseExecutor<T>= (
     resolve: (value: T) => void,
     reject: (reason?: any) => void
 ) => void;
+
+
 class RetryablePromise<T> extends Promise<T> {
     static async retry<T>(
         retries: number,
@@ -59,13 +61,13 @@ type InputType = {
       type: string;
       value?: any;
     };
-  };
+};
   
-  type TransformedType = {
+type TransformedType = {
     [key: string]: any;
-  };
+};
   
-  const transformObject = (input: InputType): TransformedType => {
+const transformObject = (input: InputType): TransformedType => {
     const result: TransformedType = {};
   
     for (const key in input) {
