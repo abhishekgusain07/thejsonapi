@@ -13,6 +13,7 @@ const Page = () => {
                 const user = await findUserByEmail(userEmail);
                 if (user) {
                     console.log('Found User:', user);
+                    console.log('User Api Key')
                     setUserFound(true);
                 } else {
                     console.log('User not found');
