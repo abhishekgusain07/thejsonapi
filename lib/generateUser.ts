@@ -1,3 +1,4 @@
+"use server"
 import { prisma } from "./prisma";
 
 interface UserInterface {
@@ -33,10 +34,10 @@ export const createUser = async({email, name}: UserInterface) => {
         })
         console.log('created User:', newUser);
         console.log('Created ApiKey:', newApiKey)
-    } catch(error) {
-        console.log('Error Creating new User', error);
-    } finally {
-        await prisma.$disconnect();
+        return {newUser, newApiKey}
+    }catch(error){
+        console.log("user not created in database due to some issue: ", error);
     }
+        
 }
 
