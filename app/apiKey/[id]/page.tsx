@@ -2,7 +2,7 @@
 
 import generateApiKey from "generate-api-key";
 import Loader from "@/components/Loader";
-import { useUser } from "@clerk/nextjs";
+import { useAuth, useUser } from "@clerk/nextjs";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { CardDemo } from "@/components/CardDemo";
@@ -17,6 +17,9 @@ const Page = () => {
     const [key, setKey] = useState<string>("");
     const [keyPresent, setKeyPresent] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(true);
+
+
+//   const { isLoaded, userId, sessionId, getToken } = useAuth();
     useEffect(() => {
         setLoading(true)
         if(user) {
@@ -35,7 +38,7 @@ const Page = () => {
         return () => {}
     },[user])
     if(loading)return <Loader />
-    return <div>
+    return <div className="flex flex-col gap-y-4 mb-6">
         <CardDemo />
     </div>
 }
