@@ -3,6 +3,8 @@ import { SignInButton, SignedIn, UserButton, useUser } from "@clerk/nextjs"
 import Image from "next/image"
 import Link from "next/link"
 import { Button } from "./ui/button";
+import { useEffect, useState } from "react";
+import Loader from "./Loader";
 
 
 export default function Header({
@@ -10,7 +12,8 @@ export default function Header({
 }: {
     photo?: string
 }){
-    const {isSignedIn, user} = useUser();
+    const {isSignedIn, user, isLoaded} = useUser();
+    if(!isLoaded) return <Loader/>
     return (
         <header className="flex justify-between items-center w-full mt-5 border-b-2 pb-7 sm:px-4 px-2">
             <Link href="/" className="flex space-x-2">

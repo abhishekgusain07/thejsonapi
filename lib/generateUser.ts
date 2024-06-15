@@ -5,7 +5,7 @@ interface UserInterface {
     email: string;
     name?: string
 }
-const generateApiKey = (length:number = 32):string => {
+export const generateApiKey = (length:number = 32):string => {
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+~`|}{[]:;?><,./-=';
     let apiKey = '';
     const charactersLength = characters.length;

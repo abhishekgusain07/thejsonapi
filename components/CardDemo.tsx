@@ -1,6 +1,5 @@
 "use client"
-import { BellRing, Zap } from "lucide-react"
-
+import { BellRing, Copy, Zap } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
@@ -15,13 +14,62 @@ import { Switch } from "@/components/ui/switch"
 import MaxWidthWrapper from "./MaxWidthWrapper"
 import { useUser } from "@clerk/nextjs"
 import Image from "next/image"
+import { useEffect, useState } from "react"
+import { generateApiKey } from "@/lib/generateUser"
+import { updateApiKeyByEmail } from "@/lib/updateApiKeyByEmail"
+import { findApiKeyByEmail } from "@/lib/findApiKeyByEmail"
 
 
 type CardProps = React.ComponentProps<typeof Card>
 
 export function CardDemo({ className, ...props }: CardProps) {
+  const [apiKey, setApiKey] = useState<string>("")
   const {user} = useUser();
   const imageUrl = user?.imageUrl!;
+  const [isClicked, setIsClicked] = useState(false);
+
+  //to load the apikey on the screen after fetching it form the database
+  useEffect(() => {
+    const getApiKey = async () => {
+        try {
+            if(!user) {
+              throw Error("user is not present")
+            }
+            const userEmail = user?.primaryEmailAddress?.emailAddress!;
+            const key = await findApiKeyByEmail(userEmail);
+            if (key !== null) {
+                console.log(`Api related to ${userEmail} is availaible`);
+                setApiKey(key.key)
+            } else {
+                console.log(`Api related to ${userEmail} not availaible`);
+            }
+          } catch (error) {
+            console.error('Error retrieving user by email:', error);
+            throw new Error('Error retrieving user by email')
+          }
+    };
+    getApiKey();
+  }, [user])
+
+//  Generate new ApiKey and storing it in database
+  const copyText = (text: string) => {
+    navigator.clipboard.writeText(text);
+    setIsClicked(true);
+    setTimeout(() => setIsClicked(false), 200);
+  }
+  const generateNewApiKey = async() => {
+    const userEmail:string  = user?.primaryEmailAddress?.emailAddress as string;
+    const newApiKey:string = generateApiKey(64);
+    try {
+      const newApiKeyObject = await updateApiKeyByEmail(userEmail, newApiKey);
+      const newKey = newApiKeyObject.key
+      setApiKey(newKey)
+    }catch(error) {
+      console.log('cannot update apiKey due to some error', error)
+      throw new Error("cannot update apiKey due to some error")
+    }
+  }
+
   return (
     <MaxWidthWrapper className="">
     <Card className={cn("w-[380px]", className)} {...props}>
@@ -46,21 +94,30 @@ export function CardDemo({ className, ...props }: CardProps) {
           <Switch />
         </div>
         <div>
-          <div className="mb-4 grid grid-cols-[25px_1fr] items-start pb-4 last:mb-0 last:pb-0" >
-                <span className="flex h-2 w-2 translate-y-1 rounded-full bg-sky-500" />
-                <div className="space-y-1">
-                  <p className="text-sm font-medium leading-none">
-                    title
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    description
-                  </p>
+          <div className="mb-4 flex flex-col space-y-2" >
+                <div className="flex flex-col items-start justify-center space-y-2">
+                  <div className="flex items-center justify-center p-2">
+                    <p className="text-sm font-medium ">
+                      Api Key
+                      </p>
+                  </div>
+                  <div className="flex flex-row items-center justify-normal p-2">
+                    <div className="grid grid-cols-2  items-center">
+                      <div className="text-sm text-muted-foreground justify-between mr-3">
+                        {apiKey}
+                      </div>
+                      <div>
+                      <Copy onClick={() => copyText(apiKey)} className={`w-4 h-4 transition-transform duration-200 ${isClicked ? 'scale-75' : 'scale-100'}`}/>
+                      </div>
+                    </div>
+                  </div> 
                 </div>
+                
             </div>
         </div>
       </CardContent>
       <CardFooter>
-        <Button className="w-full">
+        <Button className="w-full" onClick={generateNewApiKey}>
           <Zap className="mr-2 h-4 w-4" /> Generate New Api Key
         </Button>
       </CardFooter>
