@@ -3,6 +3,10 @@ import { exec } from "child_process";
 import { NextRequest, NextResponse } from "next/server";
 import { ZodTypeAny, z } from "zod";
 import { EXAMPLE_ANSWER, EXAMPLE_PROMPT } from "./example";
+import { auth } from "@clerk/nextjs/server";
+import { findApiKeyByEmail } from "@/lib/findApiKeyByEmail";
+import { useUser } from "@clerk/nextjs";
+import { findUserByEmail } from "@/lib/findUserByEmail";
 
 const determineSchemaType = (schema: any) => {
     if(!schema.hasOwnProperty("type")){
@@ -81,9 +85,47 @@ const transformObject = (input: InputType): TransformedType => {
     return result; // Return the result object
   };
 export const POST = async(req: NextRequest) => {
-    const body = await req.json();
-    // todo: validate api key of the user.
     
+    // todo: validate api key of the user.
+    const apiKeyHeader = req.headers.get("apiKey");
+    const emailInHeader = req.headers.get("email");
+    if(!apiKeyHeader) {
+        return NextResponse.json({
+            error: "apiKey missing from header"
+        },{status: 400})
+    }
+    if(!emailInHeader) {
+        return NextResponse.json({
+            error: "email missing from header"
+        },{status: 400})
+    }
+    let userId:string | undefined = ""
+    try{
+        const userByEmail = await findUserByEmail(emailInHeader);
+        userId = userByEmail?.email
+    }catch(error) {
+        console.log(` user with email ${emailInHeader} not found in DB `);
+
+        return NextResponse.json({error: ` user with email ${emailInHeader} not found in DB `},{status: 400})
+    }
+    if(!userId || userId === "")throw new Error(`You must be signed in to access api`);
+
+    let apiKeyInDb:string|undefined = ""
+    try {
+        const userInDb = await findApiKeyByEmail(userId);
+        apiKeyInDb = userInDb?.key
+    }catch(error) {
+        console.log('cannot fetch api from the database of user with email: ', userId);
+
+        return NextResponse.json({error: `cannot fetch api from database of user with email  ${userId}`},{status: 400})
+    }
+    if(apiKeyInDb ===  undefined || apiKeyInDb === "") {
+        return NextResponse.json({error: `cannot fetch api from database of user with email  ${userId}`},{status: 400})
+    }
+    if(apiKeyHeader !== apiKeyHeader) {
+        return NextResponse.json({ error: "Invalid API key"}, {status: 403});
+    }
+
 
     //validation incoming data format using zod
     //and the format we want to send the data back again
@@ -92,6 +134,7 @@ export const POST = async(req: NextRequest) => {
         format: z.object({}).passthrough()
 
     })
+    const body = await req.json();
     const {data, format} = genericSchema.parse(body);
     
     //creating a schema from the expected user format
@@ -99,8 +142,6 @@ export const POST = async(req: NextRequest) => {
 
 
     //retry mechanism
-    
-
     const validationResult =  await RetryablePromise.retry<object>(5, async(resolve, reject) => {
         try{
             //cal lAI

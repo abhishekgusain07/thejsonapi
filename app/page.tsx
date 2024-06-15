@@ -13,6 +13,7 @@ export default function Home() {
     router.push(`/apiKey/abhishek`);
   }
   const {isSignedIn, user} = useUser();
+  console.log(user)
   return (
     <div>
       <Header/>
