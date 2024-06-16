@@ -6,7 +6,7 @@ import { createUser } from '@/lib/generateUser';
 import { NextResponse } from 'next/server';
 
 interface UserDeatil {
-  name: string;
+  name?: string;
   email: string;
 }
 async function createUserAndGetData(userDetail:UserDeatil) {

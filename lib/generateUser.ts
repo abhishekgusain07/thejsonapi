@@ -15,29 +15,53 @@ export const generateApiKey = (length:number = 32):string => {
     return apiKey;
 }
 export const createUser = async({email, name}: UserInterface) => {
-    try{
-        const newUser = await prisma.user.create({
-            data: {
-                email:email,
-                name: name
-            },
-        });
-        const apiKey:string = generateApiKey(64);
 
-        const newApiKey = await prisma.apiKey.create({
-            data: {
-                key: apiKey,
-                user: {
-                    connect: {id: newUser.id}
+    const apikey = generateApiKey(64)
+    const result = await prisma.$transaction(async(prisma) => {
+        try{
+            const user = await prisma.user.create({
+                data: {
+                   name, 
+                   email 
                 }
+            });
+            const apiKeyRecord = await prisma.apiKey.create({
+                data: {
+                    key: apikey,
+                    userId: user.id
+                }
+            })
+            return {
+                user,
+                apikey:apiKeyRecord.key
             }
-        })
-        console.log('created User:', newUser);
-        console.log('Created ApiKey:', newApiKey)
-        return {newUser, newApiKey}
-    }catch(error){
-        console.log("user not created in database due to some issue: ", error);
-    }
-        
+        }catch(error) {
+            console.log('User not created in database due to error: ', error)
+            throw new Error('User not created in database due to error')
+        }
+    })
+    // try{
+    //     const newUser = await prisma.user.create({
+    //         data: {
+    //             email:email,
+    //             name: name
+    //         },
+    //     });
+    //     const apiKey:string = generateApiKey(64);
+
+    //     const newApiKey = await prisma.apiKey.create({
+    //         data: {
+    //             key: apiKey,
+    //             user: {
+    //                 connect: {id: newUser.id}
+    //             }
+    //         }
+    //     })
+    //     console.log('created User:', newUser);
+    //     console.log('Created ApiKey:', newApiKey)
+    //     return {newUser, newApiKey}
+    // }catch(error){
+    //     console.log("user not created in database due to some issue: ", error);
+    // }
 }
 

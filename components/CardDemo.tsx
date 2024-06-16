@@ -36,6 +36,7 @@ export function CardDemo({ className, ...props }: CardProps) {
               throw Error("user is not present")
             }
             const userEmail = user?.primaryEmailAddress?.emailAddress!;
+            console.log(userEmail);
             const key = await findApiKeyByEmail(userEmail);
             if (key !== null) {
                 console.log(`Api related to ${userEmail} is availaible`);

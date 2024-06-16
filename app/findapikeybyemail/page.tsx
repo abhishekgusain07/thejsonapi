@@ -14,7 +14,7 @@ const Page = () => {
                 const key = await findApiKeyByEmail(userEmail);
                 if (key !== null) {
                     console.log(`Api related to ${userEmail} is availaible`);
-                    console.log(key, key.key)
+                    console.log(key)
                     setApiKeyFound(true);
                 } else {
                     console.log(`Api related to ${userEmail} not availaible`);
