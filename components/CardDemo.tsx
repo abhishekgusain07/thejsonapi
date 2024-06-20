@@ -52,7 +52,7 @@ export function CardDemo({ className, ...props }: CardProps) {
     getApiKey();
   }, [user])
 
-//  Generate new ApiKey and storing it in database
+  //  Generate new ApiKey and storing it in database
   const copyText = (text: string) => {
     navigator.clipboard.writeText(text);
     setIsClicked(true);

@@ -31,6 +31,8 @@ export const createUser = async({email, name}: UserInterface) => {
                     userId: user.id
                 }
             })
+            const returnObject = {user, apiKey: apiKeyRecord.key}
+            console.log(returnObject);
             return {
                 user,
                 apikey:apiKeyRecord.key
