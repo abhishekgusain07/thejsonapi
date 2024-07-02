@@ -72,7 +72,8 @@ export function CardDemo({ className, ...props }: CardProps) {
   }
 
   return (
-    <MaxWidthWrapper className="">
+    <div className="relative mx-auto ">
+      <MaxWidthWrapper>
     <Card className={cn("w-[380px]", className)} {...props}>
       <CardHeader className="flex flex-row justify-between mx-3">
         <div className="flex flex-col gap-y-1 justify-center items-start">
@@ -124,5 +125,6 @@ export function CardDemo({ className, ...props }: CardProps) {
       </CardFooter>
     </Card>
     </MaxWidthWrapper>
+    </div>
   )
 }

@@ -10,10 +10,9 @@ import { useRouter } from "next/navigation";
 export default function Home() {
   const router = useRouter();
   const handleButtonClick = () => {
-    router.push(`/apiKey/abhishek`);
+    router.push(`/apiKey/${user?.firstName}`);
   }
   const {isSignedIn, user} = useUser();
-  console.log(user)
   return (
     <div>
       <Header/>
