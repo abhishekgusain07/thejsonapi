@@ -1,7 +1,7 @@
 "use server";
 import { prisma } from "../../prisma";
 
-export async function findApiKeyByEmail(email: string):Promise<string | null> {
+export async function findApiKeyByEmail({email}:{email: string}):Promise<string | null> {
     try {
         const user = await prisma.user.findUnique({
             where: { email: email },

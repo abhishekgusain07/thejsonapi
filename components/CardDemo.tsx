@@ -15,9 +15,8 @@ import MaxWidthWrapper from "./MaxWidthWrapper"
 import { useUser } from "@clerk/nextjs"
 import Image from "next/image"
 import { useEffect, useState } from "react"
-import { generateApiKey } from "@/lib/generateUser"
-import { updateApiKeyByEmail } from "@/lib/updateApiKeyByEmail"
-import { findApiKeyByEmail } from "@/lib/findApiKeyByEmail"
+import { generateApiKey, updateApiKeyByEmail } from "@/lib/dbFunctions/user/user"
+import { findApiKeyByEmail } from "@/lib/dbFunctions/apiKey/apiKey"
 
 
 type CardProps = React.ComponentProps<typeof Card>
@@ -37,10 +36,10 @@ export function CardDemo({ className, ...props }: CardProps) {
             }
             const userEmail = user?.primaryEmailAddress?.emailAddress!;
             console.log(userEmail);
-            const key = await findApiKeyByEmail(userEmail);
+            const key = await findApiKeyByEmail({email: userEmail});
             if (key !== null) {
                 console.log(`Api related to ${userEmail} is availaible`);
-                setApiKey(key.key)
+                setApiKey(key)
             } else {
                 console.log(`Api related to ${userEmail} not availaible`);
             }
@@ -51,7 +50,7 @@ export function CardDemo({ className, ...props }: CardProps) {
     };
     getApiKey();
   }, [user])
-
+  console.log(apiKey)
   //  Generate new ApiKey and storing it in database
   const copyText = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -60,10 +59,8 @@ export function CardDemo({ className, ...props }: CardProps) {
   }
   const generateNewApiKey = async() => {
     const userEmail:string  = user?.primaryEmailAddress?.emailAddress as string;
-    const newApiKey:string = generateApiKey(64);
     try {
-      const newApiKeyObject = await updateApiKeyByEmail(userEmail, newApiKey);
-      const newKey = newApiKeyObject.key
+      const newKey = await updateApiKeyByEmail({email:userEmail})
       setApiKey(newKey)
     }catch(error) {
       console.log('cannot update apiKey due to some error', error)

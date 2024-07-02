@@ -19,7 +19,7 @@ export const generateApiKey = (length:number):string=> {
 }
 export const createUser = async({email, name, clerkUserId}: UserInterface) => {
     try {
-        let apiKey = await generateApiKey(64)
+        let apiKey = generateApiKey(64)
         console.log("------->"+ typeof apiKey + " <------- ")
         const newUser = await prisma.user.create({
             data: {
@@ -88,38 +88,37 @@ export const findUserByEmail = async({
     }
 }
 
-export const updateApiKeyByEmail = async({
-    email
-}:{
-    email: string
-}):Promise<string> => {
-    try{
+
+export const updateApiKeyByEmail = async ({ email }: { email: string }): Promise<string> => {
+    const newApiKey = generateApiKey(64);
+    console.log("Generated new API key: ", newApiKey);
+
+    try {
         const user = await prisma.user.findUnique({
-            where: {email: email}
-        })
-        if (!user) {
+            where: { email },
+            include: { apiKey: true }
+        });
+
+        if (!user || !user.apiKey) {
             throw new Error(`User with email ${email} not found`);
         }
 
-        const newApiKey = await generateApiKey(64)
-            const existingApiKey = await prisma.apiKey.findUnique({
-                where: {userId: user.id}
-            })
-            if(existingApiKey) {
-                await prisma.apiKey.update({
-                    where: {userId: user.id},
-                    data: { key: newApiKey }
-                })
-            } else {
-                await prisma.apiKey.create({
-                    data: {
-                        key: newApiKey,
-                        userId: user.id
-                    }
-                });
-            }
-        return newApiKey
-    }catch(error) {
+        const updatedApiKey = await prisma.apiKey.update({
+            where: { id: user.apiKey.id },
+            data: { key: newApiKey },
+        });
+
+        console.log('Updated API Key:', updatedApiKey);
+
+        const updatedUser = await prisma.user.findUnique({
+            where: { email },
+            include: { apiKey: true },
+        });
+
+        console.log('Updated User:', updatedUser);
+
+        return updatedUser?.apiKey?.key!;
+    } catch (error) {
         console.error(`Error updating API key for user with email ${email}:`, error);
         throw new Error(`Error updating API key for user with email ${email}: ${error}`);
     }
